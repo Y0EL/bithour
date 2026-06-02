@@ -5,7 +5,7 @@ primary_region = 'sin'
   dockerfile = 'Dockerfile'
 
 [deploy]
-  release_command = 'node node_modules/prisma/build/index.js db push --accept-data-loss'
+  release_command = 'node node_modules/prisma/build/index.js db push'
 
 [env]
   PORT            = '3000'

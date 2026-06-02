@@ -2,43 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../../../auth/[...nextauth]/route';
-import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
+import { downloadFromS3 } from '@/lib/s3';
 import fs from 'fs';
 import path from 'path';
-
-const getB2Endpoint = () => {
-    const raw = process.env.B2_ENDPOINT;
-    if (!raw) return undefined;
-    if (raw.startsWith('http')) return raw;
-    return `https://${raw}`;
-};
-
-const getR2Endpoint = () => {
-    const raw = process.env.R2_ENDPOINT;
-    if (!raw) return undefined;
-    if (raw.startsWith('http')) return raw;
-    return `https://${raw}`;
-};
-
-const b2Client = new S3Client({
-    endpoint: getB2Endpoint(),
-    region: process.env.B2_REGION || "us-east-005",
-    credentials: {
-        accessKeyId: process.env.B2_APPLICATION_KEY_ID!,
-        secretAccessKey: process.env.B2_APPLICATION_KEY!,
-    },
-    forcePathStyle: true,
-});
-
-const r2Client = new S3Client({
-    endpoint: getR2Endpoint(),
-    region: process.env.R2_REGION || "auto",
-    credentials: {
-        accessKeyId: process.env.R2_ACCESS_KEY_ID!,
-        secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,
-    },
-    forcePathStyle: true,
-});
 
 export async function GET(
     req: NextRequest,
@@ -148,41 +114,17 @@ export async function GET(
             }
         }
 
-        // 2. If it's an S3/B2/R2 URL
-        const isR2 = url.includes('r2.cloudflarestorage.com');
-        const isB2 = url.includes('backblazeb2.com') || url.includes('.s3.');
-
-        if (isR2 || isB2) {
+        // 2. Any S3-compatible URL (R2, B2, Tigris, MinIO) — proxy via server
+        const isS3Url = url.startsWith('http') && !url.startsWith(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost');
+        if (isS3Url) {
             try {
-                const urlObj = new URL(url);
-                const r2Bucket = process.env.R2_BUCKET_NAME || '';
-                const b2Bucket = process.env.B2_BUCKET_NAME || '';
-                const bucketName = isR2 ? r2Bucket : b2Bucket;
-                const client = isR2 ? r2Client : b2Client;
-
-                // Intelligent Key Extraction with Decoding
-                let rawPath = urlObj.pathname.startsWith('/') ? urlObj.pathname.substring(1) : urlObj.pathname;
-                let key = decodeURIComponent(rawPath);
-
-                // If it's path-style access (/bucket/key), remove the bucket name from key
-                if (key.startsWith(`${bucketName}/`)) {
-                    key = key.replace(`${bucketName}/`, '');
-                }
-
-                const command = new GetObjectCommand({
-                    Bucket: bucketName,
-                    Key: key,
-                });
-
-                const response = await client.send(command);
+                const response = await downloadFromS3(url);
                 const stream = response.Body as any;
-
-                const chunks = [];
+                const chunks: Buffer[] = [];
                 for await (const chunk of stream) {
-                    chunks.push(chunk);
+                    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
                 }
                 const buffer = Buffer.concat(chunks);
-
                 return new NextResponse(buffer, {
                     headers: {
                         'Content-Type': 'application/pdf',
@@ -191,16 +133,11 @@ export async function GET(
                 });
             } catch (s3Error: any) {
                 console.error('S3 Fetch Error:', s3Error);
-                return NextResponse.json({
-                    error: 'Failed to fetch file from storage.',
-                    details: s3Error.message,
-                    attemptedKey: decodeURIComponent(new URL(url).pathname)
-                }, { status: 502 });
+                return NextResponse.json({ error: 'Failed to fetch file from storage.', details: s3Error.message }, { status: 502 });
             }
         }
 
-        // Default: just redirect
-        return NextResponse.redirect(url);
+        return NextResponse.json({ error: 'Document file not accessible' }, { status: 404 });
 
     } catch (error: any) {
         console.error('Download error:', error);

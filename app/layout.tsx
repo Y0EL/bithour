@@ -26,11 +26,18 @@ export const metadata: Metadata = {
     apple: "/bithour-logo.webp",
   },
   openGraph: {
-    title: "Bithour Production | Internal System",
-    description: "Internal Document Management & Creator Pipeline System",
+    title: "Bithour Production | Internal Portal",
+    description: "Internal Document Management & Creator Pipeline System — Bithour Production",
     siteName: "Bithour Production",
     locale: "id_ID",
     type: "website",
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Bithour Production" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Bithour Production | Internal Portal",
+    description: "Internal Document Management & Creator Pipeline System",
+    images: ["/opengraph-image"],
   },
 };
 

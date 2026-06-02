@@ -1,170 +1,229 @@
-# MOU Generator - PT. Decision Tree Indonesia
+<div align="center">
+  <img src="./public/readme-banner.svg" alt="Bithour Production" width="100%"/>
+</div>
 
-Sistem generator dokumen untuk Invoice dan MOU (Memorandum of Understanding) khusus content creator.
+<br/>
+
+<div align="center">
+
+![Next.js](https://img.shields.io/badge/Next.js-16.1-black?style=flat-square&logo=nextdotjs)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=flat-square&logo=typescript&logoColor=white)
+![Prisma](https://img.shields.io/badge/Prisma-5.22-2D3748?style=flat-square&logo=prisma&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Neon-4169E1?style=flat-square&logo=postgresql&logoColor=white)
+![Redis](https://img.shields.io/badge/Redis-Upstash-DC382D?style=flat-square&logo=redis&logoColor=white)
+![Fly.io](https://img.shields.io/badge/Deployed-Fly.io-8B5CF6?style=flat-square&logo=flydotio&logoColor=white)
+
+**Internal Document Management & Creator Pipeline System**
+
+[**Live App**](https://bithour-production.fly.dev) · [Creator Portal](#creator-portal) · [Local Dev](#local-development)
+
+</div>
+
+---
+
+## Overview
+
+Portal internal Bithour Production untuk manajemen kreator konten TikTok — dari onboarding hingga pembayaran. Sistem menangani seluruh alur kerja: pembuatan MoU dan Invoice PDF, review video, signing digital, hingga monitoring creator pipeline.
 
 ## Features
 
-### 1. Invoice Generator
-- Format invoice custom: `A/B-XXX-INV-DTI-YYYYMMDD-ZZZZ`
-- Integrasi bank Indonesia dengan SWIFT code otomatis
-- Signature capture digital
-- Export ke PDF format A4
-- Mobile responsive
+| Modul | Deskripsi |
+|---|---|
+| **Creator Pipeline** | Manajemen status kreator dari REACHOUT hingga FINISHED |
+| **Document Generation** | Auto-generate Invoice dan MoU PDF via background worker |
+| **Digital Signing** | Portal kreator untuk tanda tangan dokumen secara digital |
+| **Video Review** | Upload, review, dan approval konten video kreator |
+| **AI Parsing** | Parse data kreator dari teks bebas via Gemini AI |
+| **Multi-role Access** | BD, Team Leader, Finance, Manager, Curator, Analyst |
+| **Creator Portal** | Portal khusus kreator via link unik (tanpa login) |
+| **Messaging** | Chat internal antara tim dan kreator |
 
-### 2. MOU Generator
-- Template DOCX dengan placeholder
-- Auto-fill data creator
-- Export ke DOCX (PDF conversion optional)
-- Username creator sebagai judul konten
+## Architecture
+
+```
+┌─────────────────────────────────────────────────┐
+│              Fly.io (Singapore)                 │
+│                                                 │
+│  ┌─────────────┐    ┌──────────────────────┐   │
+│  │  Next.js    │    │   BullMQ Workers      │   │
+│  │  App Router │    │  documentWorker       │   │
+│  │  + API      │    │  videoProcessor       │   │
+│  │  Routes     │    │  chatWorker           │   │
+│  └──────┬──────┘    └──────────┬───────────┘   │
+│         │                      │               │
+└─────────┼──────────────────────┼───────────────┘
+          │                      │
+    ┌─────▼──────┐    ┌──────────▼───────┐
+    │    Neon    │    │  Upstash Redis   │
+    │ PostgreSQL │    │  (BullMQ Queue)  │
+    └────────────┘    └──────────────────┘
+                             │
+                    ┌────────▼────────┐
+                    │  Tigris S3      │
+                    │  (File Storage) │
+                    └─────────────────┘
+```
 
 ## Tech Stack
 
-- **Frontend**: Next.js 16 + React 19 + TypeScript
-- **PDF Generation**: pdf-lib + sharp
-- **DOCX Generation**: docxtemplater + pizzip
-- **Styling**: Vanilla CSS (Black & White Elegant Theme)
-- **Signature**: react-signature-canvas
+- **Framework**: Next.js 16.1 (App Router, React 19, TypeScript)
+- **Database**: PostgreSQL via Prisma ORM (Neon serverless)
+- **Queue**: BullMQ + Redis (Upstash)
+- **Storage**: S3-compatible (Tigris on Fly.io / MinIO local)
+- **Auth**: NextAuth.js (JWT credentials)
+- **AI**: Google Gemini 2.0 Flash (parsing, feedback improvement)
+- **PDF**: pdf-lib + sharp (Invoice & MoU generation)
+- **Deploy**: Fly.io (Docker multi-stage, standalone mode)
 
-## Installation
+---
+
+## Local Development
+
+### Prerequisites
+
+- Node.js 20+
+- Docker Desktop
+
+### Setup
 
 ```bash
+# 1. Clone and install
+git clone <repo>
+cd bithour-production
 npm install
-```
 
-## Setup MOU Template
+# 2. Start infrastructure (Postgres, Redis, MinIO)
+docker compose -f docker-compose.dev.yml up -d
 
-1. Buat file `mou.docx` di folder `public/templates/`
-2. Gunakan placeholder format: `{{ variable_name }}`
-3. Lihat dokumentasi lengkap di `public/templates/README_TEMPLATE.md`
+# 3. Push schema and seed
+npx prisma db push
+npx tsx prisma/seed.ts
 
-### Placeholders yang tersedia:
-- `{{ nama }}` - Nama lengkap creator
-- `{{ nomor_ktp }}` - Nomor KTP 16 digit
-- `{{ alamat }}` - Alamat lengkap
-- `{{ judul_konten }}` - Username creator (auto-filled)
-- `{{ jenis_konten }}` - Jenis konten
-- `{{ tanggal_pembuatan }}` - Tanggal pembuatan
-- `{{ durasi }}` - Durasi konten
-
-## Development
-
-```bash
+# 4. Start dev server
 npm run dev
 ```
 
-Buka [http://localhost:3000](http://localhost:3000)
+App berjalan di `http://localhost:3000`
+
+### Environment Variables (Local)
+
+File `.env.local` sudah dikonfigurasi untuk Docker local:
+
+```env
+DATABASE_URL=postgresql://crowncare:crowncare_secret@localhost:5433/crowncare
+REDIS_HOST=localhost
+REDIS_PORT=6379
+NEXTAUTH_SECRET=local-dev-secret-change-in-production-32chars!
+NEXTAUTH_URL=http://localhost:3000
+R2_ENDPOINT=http://localhost:9000
+R2_BUCKET_NAME=crowncare
+GEMINI_API_KEY=your_key_here
+```
+
+### Docker (Full Stack)
+
+```powershell
+# Start full stack including app
+.\docker-local.ps1 up
+
+# Seed database
+.\docker-local.ps1 seed
+
+# View logs
+.\docker-local.ps1 logs
+```
+
+---
+
+## Test Accounts
+
+Password semua akun: **`crowncare123`**
+
+| Username | Role | Akses |
+|---|---|---|
+| `bd_andi` | Business Development | Input kreator, buat dokumen |
+| `tl_dewi` | Team Leader | Review video kreator |
+| `manager_david` | Manager | Lihat semua data, laporan |
+| `finance_rina` | Finance | Proses pembayaran |
+| `curator_maya` | Curator | Endorsement video |
+| `analyst_putri` | Analyst | Analytics dashboard |
+
+---
+
+## Creator Portal
+
+Setiap kreator mendapat URL unik untuk mengakses portalnya:
+
+```
+https://bithour-production.fly.dev/creator/s/{username}/{token}
+```
+
+Kreator bisa:
+- Melihat status pipeline mereka
+- Upload video draft
+- Tanda tangan dokumen (MoU/Invoice)
+- Chat dengan tim internal
+
+Login kreator dari halaman utama → tab **Kreator** → masukkan Kode Akses.
+
+---
+
+## Production Deployment
+
+App di-deploy ke Fly.io dengan konfigurasi:
+
+```toml
+app = 'bithour-production'
+primary_region = 'sin'   # Singapore
+```
+
+```powershell
+# Deploy
+fly deploy --app bithour-production --remote-only
+
+# Logs
+fly logs --app bithour-production
+
+# Status
+fly status --app bithour-production
+```
+
+### Production Services
+
+| Service | Provider | Keterangan |
+|---|---|---|
+| App Hosting | Fly.io | 2 machines, Singapore |
+| Database | Neon PostgreSQL | Serverless |
+| Cache + Queue | Upstash Redis | Pay-as-you-go |
+| File Storage | Tigris (Fly.io) | S3-compatible |
+| AI | Google Gemini 2.0 Flash | Parsing & feedback |
+
+---
 
 ## Project Structure
 
 ```
-├── app/
-│   ├── api/
-│   │   ├── invoices/generate/    # Invoice PDF generator
-│   │   └── mou/generate/          # MOU DOCX generator
-│   ├── create/                    # Invoice form page
-│   ├── mou/                       # MOU form page
-│   └── page.tsx                   # Homepage
-├── components/
-│   ├── InvoiceForm.tsx           # Invoice form component
-│   ├── MOUForm.tsx               # MOU form component
-│   └── SignaturePad.tsx          # Signature capture
-├── public/
-│   ├── templates/
-│   │   ├── mou.docx              # MOU template (user upload)
-│   │   └── README_TEMPLATE.md    # Template documentation
-│   ├── invoices/                 # Generated invoices
-│   └── mou/                      # Generated MOU files
-├── tmp/                          # Temporary files (gitignored)
-└── utils/
-    ├── types.ts                  # Invoice types
-    └── mouTypes.ts               # MOU types
+app/
+├── dashboard/            # Protected internal dashboard
+│   ├── creators/         # Creator pipeline management
+│   ├── documents/        # Document management
+│   ├── review/           # Video review
+│   └── settings/         # System settings
+├── creator/s/[u]/[token]/ # Public creator portal
+├── login/                # Auth page (staff + kreator)
+└── api/                  # API routes
+lib/
+├── workers/              # BullMQ background workers
+├── redis.ts              # Redis connection (Upstash TLS)
+├── s3.ts                 # S3/Tigris storage client
+└── queue.ts              # BullMQ queue definitions
+prisma/
+├── schema.prisma         # Database schema
+└── seed.ts               # Mock data seeder
 ```
 
-## Usage
+---
 
-### Invoice Generator
-1. Akses `/create`
-2. Pilih tipe invoice (A=Endorsement, B=Owning Content)
-3. Isi ref number (3 digit)
-4. Isi data creator dan payment details
-5. Tanda tangan digital
-6. Generate & Download PDF
-
-### MOU Generator
-1. Akses `/mou`
-2. Isi data creator (nama, KTP, alamat, username)
-3. Pilih jenis konten dan durasi
-4. Generate & Download DOCX
-
-## Bank List & SWIFT Codes
-
-Sistem mendukung 10 bank utama Indonesia:
-- Bank Mandiri (BMRIIDJA)
-- BRI (BRINIDJA)
-- BCA (CENAIDJA)
-- BNI (BNINIDJA)
-- BTN (BTANIDJA)
-- BSI (BSMDIDJA)
-- CIMB Niaga (BNIAIDJA)
-- OCBC (NISPIDJA)
-- Permata (BBBAIDJA)
-- Danamon (BDINIDJA)
-
-Jika bank tidak ada di list, user bisa input manual.
-
-## PDF Conversion (Optional)
-
-Saat ini MOU generator menghasilkan file DOCX. Untuk konversi ke PDF:
-
-### Option 1: LibreOffice Headless
-```bash
-# Install LibreOffice
-apt-get install libreoffice
-
-# Convert command
-soffice --headless --convert-to pdf --outdir ./tmp ./tmp/mou.docx
-```
-
-### Option 2: Cloud API
-- Cloudmersive Document Conversion API
-- Google Docs API
-- Microsoft Graph API
-
-## Environment Variables
-
-Tidak ada environment variables yang diperlukan untuk development.
-
-## Deployment
-
-### Vercel (Recommended)
-```bash
-vercel deploy
-```
-
-### Docker
-```dockerfile
-FROM node:20-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
-RUN npm run build
-EXPOSE 3000
-CMD ["npm", "start"]
-```
-
-## Notes
-
-- Invoice format mengikuti standar PT. Decision Tree Indonesia
-- SWIFT code otomatis terisi jika bank dipilih dari dropdown
-- Signature date di PDF menggunakan bold font
-- Template MOU harus disiapkan user (contoh struktur tersedia)
-- Temporary files di folder `tmp/` otomatis dibersihkan
-
-## Support
-
-Untuk pertanyaan atau issue, hubungi tim development PT. Decision Tree Indonesia.
-
-## License
-
-Proprietary - PT. Decision Tree Indonesia © 2026
+<div align="center">
+  <sub>Built for Bithour Production · Internal Use Only</sub>
+</div>
