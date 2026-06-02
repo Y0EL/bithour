@@ -123,10 +123,13 @@ export async function POST(
                 }
             });
         } else {
-            document = await prisma.document.create({
-                data: {
+            const safeDocNo = docNo || `TEMP-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+            document = await prisma.document.upsert({
+                where: { documentNo: safeDocNo },
+                update: { fileUrl, metadata: formData, status: 'COMPLETED', title: displayTitle, updatedAt: new Date() },
+                create: {
                     type: session.type,
-                    documentNo: docNo || `TEMP-${Date.now()}`,
+                    documentNo: safeDocNo,
                     title: displayTitle,
                     fileUrl,
                     status: 'COMPLETED',

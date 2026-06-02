@@ -6,6 +6,43 @@ import { appendOrUpdateSheetRow, getLatestRefWithAI } from '@/lib/sheets';
 import { InvoiceData } from '@/utils/types';
 import { MOURenderRequest } from '@/utils/mouTypes';
 
+// Finds the next unused documentNo by scanning the DB.
+// e.g. if "B-001-INV-DTI-20260602-0001" exists, tries "0002", "0003", etc.
+async function resolveUniqueDocNo(docNo: string, excludeId?: string): Promise<string> {
+    const parts = docNo.split('-');
+    const lastPart = parts[parts.length - 1];
+    const baseSeq = parseInt(lastPart, 10);
+    const prefix = parts.slice(0, -1).join('-');
+
+    // Find all existing docs with same prefix to build a used-set
+    const existing = await prisma.document.findMany({
+        where: { documentNo: { startsWith: prefix + '-' } },
+        select: { documentNo: true, id: true },
+    });
+
+    const used = new Set<number>();
+    for (const doc of existing) {
+        if (excludeId && doc.id === excludeId) continue;
+        const tail = doc.documentNo.split('-').pop() ?? '';
+        const n = parseInt(tail, 10);
+        if (!isNaN(n)) used.add(n);
+    }
+
+    if (!isNaN(baseSeq)) {
+        let next = baseSeq;
+        while (used.has(next)) next++;
+        return [...parts.slice(0, -1), String(next).padStart(lastPart.length, '0')].join('-');
+    }
+
+    // Fallback for non-numeric tail
+    let candidate = docNo;
+    let i = 2;
+    while (existing.some(d => d.documentNo === candidate && (!excludeId || d.id !== excludeId))) {
+        candidate = `${docNo}-${i++}`;
+    }
+    return candidate;
+}
+
 const ensureVAPrefix = (bankName: string, accNo: string): string => {
     if (!bankName || !accNo) return accNo;
     const bank = bankName.toLowerCase();
@@ -84,13 +121,27 @@ export const setupDocumentWorker = () => {
                     let refVal = formData.refNum || '';
                     let seqVal = formData.invSequence || '';
 
-                    // Assign only if missing (API usually fills this now, but worker provides fallback)
                     if (!refVal || !seqVal) {
                         try {
                             const aiResult = await getLatestRefWithAI('INVOICE', currentType);
-                            refVal = refVal || (aiResult.skippedRefs[0]?.toString().padStart(3, '0') || (aiResult.lastRef + 1).toString().padStart(3, '0'));
-                            seqVal = seqVal || (aiResult.skippedSeqs[0]?.toString().padStart(4, '0') || (aiResult.lastSeq + 1).toString().padStart(4, '0'));
-                        } catch (e) { console.error('Worker Numbering Error:', e); }
+                            if (aiResult.lastRef > 0 || aiResult.lastSeq > 0) {
+                                refVal = refVal || (aiResult.skippedRefs[0]?.toString().padStart(3, '0') || (aiResult.lastRef + 1).toString().padStart(3, '0'));
+                                seqVal = seqVal || (aiResult.skippedSeqs[0]?.toString().padStart(4, '0') || (aiResult.lastSeq + 1).toString().padStart(4, '0'));
+                            }
+                        } catch (e) { /* Sheets unavailable, use DB fallback below */ }
+
+                        // DB fallback: find actual max sequence from existing documents
+                        if (!refVal || !seqVal) {
+                            const lastDoc = await prisma.document.findFirst({
+                                where: { type: 'INVOICE', documentNo: { contains: `-INV-DTI-` } },
+                                orderBy: { createdAt: 'desc' },
+                                select: { documentNo: true }
+                            });
+                            const lastSeqNum = lastDoc ? parseInt(lastDoc.documentNo.split('-').pop() ?? '0', 10) : 0;
+                            const lastRefNum = lastDoc ? parseInt(lastDoc.documentNo.split('-')[1] ?? '0', 10) : 0;
+                            if (!refVal) refVal = String(isNaN(lastRefNum) ? 1 : lastRefNum + 1).padStart(3, '0');
+                            if (!seqVal) seqVal = String(isNaN(lastSeqNum) ? 1 : lastSeqNum + 1).padStart(4, '0');
+                        }
                     }
 
                     formData.refNum = refVal;
@@ -114,9 +165,23 @@ export const setupDocumentWorker = () => {
                     if (!refVal || !seqVal) {
                         try {
                             const aiResult = await getLatestRefWithAI('MOU', currentType);
-                            refVal = refVal || (aiResult.skippedRefs[0]?.toString().padStart(3, '0') || (aiResult.lastRef + 1).toString().padStart(3, '0'));
-                            seqVal = seqVal || (aiResult.skippedSeqs[0]?.toString().padStart(4, '0') || (aiResult.lastSeq + 1).toString().padStart(4, '0'));
-                        } catch (e) { console.error('Worker Numbering Error:', e); }
+                            if (aiResult.lastRef > 0 || aiResult.lastSeq > 0) {
+                                refVal = refVal || (aiResult.skippedRefs[0]?.toString().padStart(3, '0') || (aiResult.lastRef + 1).toString().padStart(3, '0'));
+                                seqVal = seqVal || (aiResult.skippedSeqs[0]?.toString().padStart(4, '0') || (aiResult.lastSeq + 1).toString().padStart(4, '0'));
+                            }
+                        } catch (e) { /* Sheets unavailable, use DB fallback below */ }
+
+                        if (!refVal || !seqVal) {
+                            const lastDoc = await prisma.document.findFirst({
+                                where: { type: 'MOU', documentNo: { contains: `-MoU-DTI-` } },
+                                orderBy: { createdAt: 'desc' },
+                                select: { documentNo: true }
+                            });
+                            const lastSeqNum = lastDoc ? parseInt(lastDoc.documentNo.split('-').pop() ?? '0', 10) : 0;
+                            const lastRefNum = lastDoc ? parseInt(lastDoc.documentNo.split('-').slice(-2, -1)[0] ?? '0', 10) : 0;
+                            if (!refVal) refVal = String(isNaN(lastRefNum) ? 1 : lastRefNum + 1).padStart(3, '0');
+                            if (!seqVal) seqVal = String(isNaN(lastSeqNum) ? 1 : lastSeqNum + 1).padStart(4, '0');
+                        }
                     }
 
                     formData.ref_number = refVal;
@@ -142,12 +207,15 @@ export const setupDocumentWorker = () => {
                 const documentId = job.data.documentId || job.data.requestId;
                 const finalStatus = job.data.isPendingSign ? 'PENDING_SIGN' : 'COMPLETED';
 
+                // Resolve unique documentNo before touching the DB
+                const safeDocNo = await resolveUniqueDocNo(docNo, documentId || undefined);
+
                 // UPDATE BOTH DOCUMENT AND SESSION (SSOT)
                 const savedDoc = await prisma.$transaction(async (tx) => {
                     if (documentId) {
                         const updated = await tx.document.update({
                             where: { id: documentId },
-                            data: { documentNo: docNo, fileUrl, status: finalStatus as any, metadata: formData, title: displayTitle }
+                            data: { documentNo: safeDocNo, fileUrl, status: finalStatus as any, metadata: formData, title: displayTitle }
                         });
                         await tx.signingSession.updateMany({
                             where: { documentId },
@@ -156,9 +224,9 @@ export const setupDocumentWorker = () => {
                         return updated;
                     } else {
                         const newDoc = await tx.document.upsert({
-                            where: { documentNo: docNo },
+                            where: { documentNo: safeDocNo },
                             update: { fileUrl, metadata: formData, updatedAt: new Date(), status: finalStatus as any },
-                            create: { type, documentNo: docNo || `TEMP-${Date.now()}`, title: displayTitle, fileUrl, status: finalStatus as any, createdById: userId, metadata: formData }
+                            create: { type, documentNo: safeDocNo, title: displayTitle, fileUrl, status: finalStatus as any, createdById: userId, metadata: formData }
                         });
                         await tx.signingSession.updateMany({
                             where: { documentId: (newDoc as any).id },

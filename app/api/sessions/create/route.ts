@@ -28,12 +28,16 @@ export async function POST(req: NextRequest) {
         const docNo = type === 'INVOICE' ? formData.invoice_no : formData.mou_number;
 
         // 2. Create the Document first (Status: PENDING_SIGN)
-        const document = await prisma.document.create({
-            data: {
+        // Use upsert to handle duplicate documentNo gracefully (e.g. double-submit)
+        const safeDocNo = docNo || `TEMP-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
+        const document = await prisma.document.upsert({
+            where: { documentNo: safeDocNo },
+            update: { metadata: formData, status: 'PENDING_SIGN', updatedAt: new Date() },
+            create: {
                 type,
-                documentNo: docNo || `TEMP-${Date.now()}`,
+                documentNo: safeDocNo,
                 title: `${type} PENDING - ${docNo}`,
-                fileUrl: '', // No file yet
+                fileUrl: '',
                 status: 'PENDING_SIGN',
                 createdById: (session.user as any).id,
                 metadata: formData,

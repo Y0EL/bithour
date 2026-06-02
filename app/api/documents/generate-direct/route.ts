@@ -80,8 +80,10 @@ export async function POST(req: NextRequest) {
         const displayUsername = (formData.from_username || formData.party2_username || 'Creator').replace(/^@/, '');
         const displayTitle = `${context} - ${displayUsername}`;
 
-        const document = await prisma.document.create({
-            data: {
+        const document = await prisma.document.upsert({
+            where: { documentNo: docNo },
+            update: { fileUrl, metadata: formData, status: 'COMPLETED', title: displayTitle, updatedAt: new Date() },
+            create: {
                 type: type,
                 documentNo: docNo,
                 title: displayTitle,
