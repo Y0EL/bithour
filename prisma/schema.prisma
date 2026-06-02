@@ -1,0 +1,318 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  SYSTEM
+  BD
+  TEAM_LEADER
+  FINANCE
+  BD_ASSISTANT_MANAGER
+  MANAGER
+  ANALYST
+  CURATOR
+}
+
+enum ChangeRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum ChangeRequestType {
+  NAME
+  USERNAME
+}
+
+enum CreatorStatus {
+  REACHOUT
+  DEALING
+  SAMPLING
+  DRAFTING
+  FINANCING
+  FINISHED
+  MONITORING
+  FAIL
+}
+
+enum DocStatus {
+  DRAFT
+  PENDING_SIGN
+  COMPLETED
+}
+
+enum DocumentType {
+  INVOICE
+  MOU
+}
+
+enum NotificationType {
+  SYSTEM
+  INFO
+  ALERT
+}
+
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REVISION
+  REJECTED
+}
+
+enum SessionStatus {
+  PENDING
+  COMPLETED
+  EXPIRED
+}
+
+model User {
+  id         String   @id @default(cuid())
+  username   String   @unique
+  email      String   @unique
+  password   String
+  role       UserRole @default(BD)
+  fullName   String
+  lastInvRef Int      @default(0)
+  lastInvSeq Int      @default(0)
+  lastMouRef Int      @default(0)
+  lastMouSeq Int      @default(0)
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  groupId String?
+  group   Group?  @relation(fields: [groupId], references: [id])
+
+  sequences        UserSequence[]
+  documents        Document[]
+  sessions         Session[]
+  changeRequests   ChangeRequest[]
+  approvedRequests ChangeRequest[]  @relation("ApprovedRequests")
+  createdSessions  SigningSession[] @relation("CreatedSessions")
+  messages         Notification[]   @relation("UserNotifications")
+  activities       ActivityLog[]
+  creatorsCreated  Creator[]        @relation("Creator_createdByIdToUser")
+  creatorsReviewed Creator[]        @relation("Creator_reviewedByIdToUser")
+  creatorsEndorsed Creator[]        @relation("Creator_endorsedByCuratorIdToUser")
+  creatorMessages  CreatorMessage[]
+
+  @@index([username])
+  @@index([email])
+}
+
+model Group {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  isSystem    Boolean  @default(false)
+  users       User[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  userId    String
+  action    String
+  details   String?
+  createdAt DateTime @default(now())
+  creatorId String?
+  Creator   Creator? @relation(fields: [creatorId], references: [id])
+  User      User     @relation(fields: [userId], references: [id])
+
+  @@index([action])
+  @@index([userId])
+}
+
+model ChangeRequest {
+  id             String              @id @default(cuid())
+  userId         String
+  type           ChangeRequestType
+  requestedValue String
+  status         ChangeRequestStatus @default(PENDING)
+  approvedById   String?
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+  approvedBy     User?               @relation("ApprovedRequests", fields: [approvedById], references: [id])
+  user           User                @relation(fields: [userId], references: [id])
+
+  @@index([status])
+  @@index([userId])
+}
+
+model Creator {
+  id                   String        @id @default(cuid())
+  name                 String
+  usernameTikTok       String        @unique
+  ktpNumber            String?
+  address              String?
+  bankName             String?
+  accountNumber        String?
+  accountName          String?
+  kcpCity              String?
+  hairCombColor        String?
+  isLongHair           Boolean?
+  patokanAddress       String?
+  phoneNumber          String?
+  status               CreatorStatus @default(REACHOUT)
+  sessionToken         String        @unique @default(cuid())
+  videoUrl             String?
+  videoUploadedAt      DateTime?
+  failedReason         String?
+  failedAt             DateTime?
+  paymentProofUrl      String?
+  financeNotes         String?
+  createdById          String
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+  isDraftApproved      Boolean       @default(false)
+  videoHistory         Json?
+  isReportedToShipment Boolean       @default(false)
+  productDescription   String?
+  isReportedToOCSheet  Boolean       @default(false)
+  ocSheetRowNumber     Int?
+  sampleDeliveryDate   DateTime?
+  sampleTrackingNumber String?
+  isOldCreator         Boolean       @default(false)
+  driveFolderId        String?
+  reviewNotes          String?
+  reviewedAt           DateTime?
+  reviewedById         String?
+  videoReviewStatus    ReviewStatus  @default(PENDING)
+  originalVideoUrl     String?
+  videoThumbnailUrl    String?
+  followers            Int?          @default(0)
+  reviewHistory        Json? // History of internal review feedback (pre-translation)
+
+  // Endorsement / Curator Phase
+  endorsedVideoUrl    String?
+  isEndorsementReview Boolean @default(false)
+  endorsedByCuratorId String?
+
+  ActivityLog       ActivityLog[]
+  createdBy         User             @relation("Creator_createdByIdToUser", fields: [createdById], references: [id])
+  reviewedBy        User?            @relation("Creator_reviewedByIdToUser", fields: [reviewedById], references: [id])
+  endorsedByCurator User?            @relation("Creator_endorsedByCuratorIdToUser", fields: [endorsedByCuratorId], references: [id])
+  CreatorMessage    CreatorMessage[]
+  SigningSessions   SigningSession[]
+
+  @@index([createdById])
+  @@index([status])
+  @@index([usernameTikTok])
+}
+
+model CreatorMessage {
+  id               String   @id @default(cuid())
+  creatorId        String
+  senderId         String?
+  content          String
+  isReadByInternal Boolean  @default(false) // Track if internal team has read this message
+  createdAt        DateTime @default(now())
+  Creator          Creator  @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  sender           User?    @relation(fields: [senderId], references: [id])
+
+  @@index([creatorId])
+  @@index([isReadByInternal])
+}
+
+model Document {
+  id             String          @id @default(cuid())
+  type           DocumentType
+  documentNo     String          @unique
+  title          String
+  fileUrl        String
+  signedFileUrl  String?
+  signedAt       DateTime?
+  isManualSigned Boolean         @default(false)
+  createdById    String
+  metadata       Json?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  status         DocStatus       @default(COMPLETED)
+  createdBy      User            @relation(fields: [createdById], references: [id])
+  SigningSession SigningSession?
+
+  @@index([createdById])
+  @@index([documentNo])
+  @@index([type])
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  title     String
+  content   String
+  isRead    Boolean          @default(false)
+  type      NotificationType @default(SYSTEM)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  User      User             @relation("UserNotifications", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([isRead])
+  @@index([userId])
+}
+
+model ReportLock {
+  id        String    @id @default("singleton")
+  isLocked  Boolean   @default(false)
+  lockedBy  String?
+  expiresAt DateTime?
+  updatedAt DateTime  @updatedAt
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([userId])
+}
+
+model SigningSession {
+  id              String        @id @default(cuid())
+  token           String        @unique
+  type            DocumentType
+  formData        Json
+  status          SessionStatus @default(PENDING)
+  expiresAt       DateTime
+  createdById     String
+  documentId      String?       @unique
+  creatorId       String?
+  changedByClient Boolean       @default(false)
+  changeLog       String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  isArchived      Boolean       @default(false)
+  createdBy       User          @relation("CreatedSessions", fields: [createdById], references: [id])
+  Document        Document?     @relation(fields: [documentId], references: [id])
+  Creator         Creator?      @relation(fields: [creatorId], references: [id])
+
+  @@index([createdById])
+  @@index([isArchived])
+  @@index([token])
+  @@index([creatorId])
+}
+
+model UserSequence {
+  id        String       @id @default(cuid())
+  userId    String
+  docType   DocumentType
+  category  String
+  lastRef   Int          @default(0)
+  lastSeq   Int          @default(0)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  User      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, docType, category])
+  @@index([userId])
+}

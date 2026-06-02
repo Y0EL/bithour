@@ -1,0 +1,279 @@
+{
+    "common": {
+        "loading": "Loading...",
+        "redirecting": "Redirecting...",
+        "logout": "Logout",
+        "dashboard": "Dashboard",
+        "crowncare": "Crowncare",
+        "cancel": "Cancel"
+    },
+    "sidebar": {
+        "groups": {
+            "Overview": "Overview",
+            "Creator Center": "Creator Center",
+            "Documents": "Documents",
+            "Preferences": "Preferences",
+            "Analysis": "Analysis",
+            "Curation": "Curation"
+        },
+        "overview": "Home",
+        "creator_center": "Creator Center",
+        "documents": "Documents",
+        "preferences": "Preferences",
+        "dashboard": "Dashboard",
+        "dashboard_curator": "Curator Dashboard",
+        "create_invoice": "Create New Invoice",
+        "create_mou": "Create New MOU",
+        "all_files": "All Files",
+        "invoices": "Invoices",
+        "mous": "MOUs",
+        "sessions": "Sessions",
+        "messages": "Messages",
+        "review_videos": "Review Videos",
+        "curator_results": "Curator Results",
+        "user_management": "Users Management",
+        "settings": "Settings",
+        "role": "Role",
+        "cloud_sync": "Cloud Storage Active (Backblaze)"
+    },
+    "dashboard": {
+        "welcome": "Welcome back",
+        "greeting_detail": "Here's what's happening with your documents today.",
+        "search_placeholder": "Search IDs, names, or titles...",
+        "searching": "Searching...",
+        "found_results": "Found {{count}} results",
+        "close": "CLOSE",
+        "no_results": "No results found for",
+        "total_invoices": "Invoices",
+        "total_mous": "MOUs",
+        "this_month": "This Month",
+        "all_documents": "Documents",
+        "quick_actions": "Quick Actions",
+        "create_invoice": "📄 Create Invoice",
+        "create_mou": "📝 Create MOU",
+        "all_documents_btn": "📁 All Documents",
+        "add_user": "Add New User",
+        "report_today": "REPORT TODAY",
+        "reporting": "REPORTING...",
+        "reported_today": "REPORTED TODAY",
+        "no_new_data": "No New Data",
+        "report_all_in": "All documents today are already reported. Check here:",
+        "open_sheets": "Open Google Sheets",
+        "update_success": "Update Successful!",
+        "report_updated": "Report successfully updated with the latest documents.",
+        "view_sheets": "View in Google Sheets",
+        "sync_failed": "Sync Failed",
+        "report_restricted": "Report access restricted for System",
+        "activity_logs": "System Activity Logs",
+        "no_logs": "No log recorded yet.",
+        "recent_activity": "Recent Activity",
+        "no_activity": "No activity yet.",
+        "details": "Details",
+        "by": "By",
+        "edit_session": "Edit Session",
+        "change_role": "Change Role",
+        "reset_password": "Reset Password",
+        "suspend_user": "Suspend User",
+        "activate_user": "Activate User",
+        "select_role": "Select New Role",
+        "new_password": "New Password",
+        "confirm_update": "Confirm Update",
+        "no_members": "No team members found",
+        "team_members": "Team Members",
+        "status": "Status",
+        "user": "User",
+        "action": "Action",
+        "requests": {
+            "title": "Change Requests",
+            "subtitle": "Review and approve user profile update requests",
+            "user": "User",
+            "change": "Change",
+            "value": "Value",
+            "date": "Date",
+            "action": "Action",
+            "approve": "Approve",
+            "reject": "Reject",
+            "no_requests": "No pending change requests.",
+            "success_approve": "Request approved successfully!",
+            "success_reject": "Request rejected successfully!"
+        },
+        "actions": {
+            "CREATE_INVOICE": "Created Invoice",
+            "CREATE_MOU": "Created MOU",
+            "UPDATE_SESSION": "Updated Session",
+            "SIGN_INVOICE": "Signed Invoice",
+            "SIGN_MOU": "Signed MOU"
+        },
+        "roles": {
+            "SYSTEM": "System Administrator",
+            "ANALYST": "Video Analyst",
+            "BD": "Business Development",
+            "MANAGER": "Manager",
+            "TEAM_LEADER": "Team Leader",
+            "FINANCE": "Finance",
+            "BD_ASSISTANT_MANAGER": "Assistant Manager",
+            "CURATOR": "Video Curator",
+            "curator": "Video Curator"
+        }
+    },
+    "settings": {
+        "title": "Security & Account",
+        "subtitle": "Manage your credentials and personal information",
+        "role": "Role",
+        "profile_info": "Profile Information",
+        "profile_notice": "Updating name or username requires manual approval from an administrator.",
+        "change_password": "Change Password",
+        "language_title": "Language Settings",
+        "language_subtitle": "Select your preferred language for the interface."
+    },
+    "messages": {
+        "title": "Messages",
+        "subtitle": "You have {{count}} unread notification{{plural}}",
+        "notifications": "Notifications",
+        "fetching": "Fetching messages...",
+        "no_messages": "No messages yet. System notifications will appear here.",
+        "marked_as_read": "Marked as Read",
+        "mark_as_read": "Mark Read"
+    },
+    "documents": {
+        "title": "All Documents",
+        "subtitle": "Overview of all generated and signed documents",
+        "search_placeholder": "Search across documents...",
+        "doc_info": "DOC INFO",
+        "created_by": "CREATED BY",
+        "amount": "AMOUNT",
+        "stamp": "STAMP",
+        "date": "DATE",
+        "time": "TIME",
+        "action": "ACTION",
+        "loading": "Loading...",
+        "no_docs": "No documents found",
+        "by": "By",
+        "mandatory_stamp": "MANDATORY STAMP",
+        "safe": "SAFE",
+        "download": "Download for Audit",
+        "view": "View Online",
+        "delete": "Delete",
+        "delete_confirm_title": "Delete Document?",
+        "delete_confirm_subtitle": "Action cannot be undone. Provide a clear reason for the creator to understand why this document was removed.",
+        "delete_reason_label": "Reason for Deletion",
+        "delete_reason_placeholder": "e.g., Wrong data entered, duplication, etc.",
+        "cancel": "Cancel",
+        "delete_forever": "Delete Forever",
+        "deleting": "Deleting...",
+        "reason_required": "Reason Required",
+        "reason_required_msg": "You must provide a reason for deletion.",
+        "deleted_title": "Deleted!",
+        "deleted_msg": "Document removed and notification sent to creator.",
+        "error_title": "Error",
+        "download_failed": "Download failed. Please try opening in a new tab.",
+        "no_file_available": "PDF file is not yet available for draft documents.",
+        "download_failed_msg": "Failed to download the file. Please contact admin if the issue persists.",
+        "session_modal": {
+            "title": "Session Created!",
+            "subtitle": "The signing session for {{name}} has been generated successfully.",
+            "label_link": "Signing Link",
+            "btn_copy": "Copy",
+            "btn_copied": "Copied!",
+            "btn_share": "Share to WhatsApp",
+            "btn_done": "Done"
+        }
+    },
+    "notifications": {
+        "session_created_title": "Session Created!",
+        "session_created_msg": "Signing session has been generated successfully.",
+        "session_updated_title": "Session Updated!",
+        "session_updated_msg": "Session data has been updated successfully.",
+        "pdf_generated_title": "PDF Generated!",
+        "pdf_generated_msg": "Your document is ready to download.",
+        "ref_used_by": "⚠️ used by {{owner}}",
+        "user_created": "User created successfully!",
+        "error_title": "Action Failed",
+        "error_msg": "Something went wrong. Please try again."
+    },
+    "review": {
+        "title": "Video Analysis",
+        "subtitle": "Manage creator submissions and quality control",
+        "tabs": {
+            "pending": "Pending Review",
+            "uploaded": "Uploaded (Curator)",
+            "approved": "Completed",
+            "revision": "Needs Improve",
+            "rejected": "Rejected"
+        },
+        "stats": {
+            "today": "Reviews Today",
+            "week": "This Week",
+            "month": "This Month",
+            "pending": "Pending Task"
+        },
+        "modal": {
+            "title": "Reviewing",
+            "feedback_label": "Feedback & Notes",
+            "feedback_placeholder": "Write feedback for the creator",
+            "reject": "Reject",
+            "revision": "Feedback",
+            "approve": "APPROVE VIDEO",
+            "notice": "Approving updates Column Q in Sheets and moves to Financing."
+        },
+        "empty": {
+            "title": "All Caught Up!",
+            "subtitle": "No videos pending review at the moment."
+        },
+        "search": "Search creator name or username",
+        "card": {
+            "endorsed_edit": "Endorsed Edit 🎬"
+        }
+    },
+    "curator": {
+        "title": "Curator Dashboard",
+        "subtitle": "Download approved videos, edit, and endorse them for final review.",
+        "search": "Search creator...",
+        "tabs": {
+            "pending": "Curation Stage",
+            "endorsed": "Endorsed",
+            "history": "Endorse History"
+        },
+        "stats": {
+            "pending": "Pending Curation",
+            "endorsed": "Completed Endorse"
+        },
+        "empty": {
+            "title": "All Done!",
+            "subtitle": "No videos found."
+        },
+        "batch": {
+            "select_all": "Select All",
+            "selected": "{{count}} Videos Selected",
+            "download_zip": "Download Batch ZIP",
+            "zipping": "Zipping ({{current}}/{{total}})"
+        },
+        "upload": {
+            "title": "Upload Endorsement",
+            "drag_drop": "Click or drag video here",
+            "format": "MP4 format, max 500MB",
+            "uploading": "Uploading...",
+            "submit": "Submit Endorsement"
+        },
+        "card": {
+            "re_edit": "Review Team Re-Edit Req",
+            "draft": "Draft",
+            "endorse": "Endorse",
+            "finish": "Finish",
+            "finished": "Completely Finished",
+            "waiting": "Waiting Review Approval",
+            "download_final": "Download Final",
+            "failed": "Failed"
+        },
+        "confirm": {
+            "title": "Action Confirmation",
+            "finish": "Are you sure you want to mark this video as Finished? Please ensure it has been approved.",
+            "download_draft": "Are you sure you want to download this draft video?",
+            "download_final": "Are you sure you want to download this completed video?",
+            "download_batch": "Are you sure you want to download a batch zip of these videos?",
+            "endorse": "Are you sure you want to upload this endorsement and send it to the Review Team?",
+            "yes": "Yes, proceed",
+            "no": "Cancel"
+        }
+    }
+}

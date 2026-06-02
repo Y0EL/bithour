@@ -1,0 +1,279 @@
+{
+    "common": {
+        "loading": "Memuat",
+        "redirecting": "Mengalihkan",
+        "logout": "Keluar",
+        "dashboard": "Dashboard",
+        "crowncare": "Crowncare",
+        "cancel": "Batal"
+    },
+    "sidebar": {
+        "groups": {
+            "Overview": "Home",
+            "Creator Center": "Pusat Kreator",
+            "Documents": "Dokumen",
+            "Preferences": "Preferensi",
+            "Analysis": "Analisis",
+            "Curation": "Kurasi Video"
+        },
+        "overview": "Home",
+        "creator_center": "Pusat Kreator",
+        "documents": "Dokumen",
+        "preferences": "Preferensi",
+        "dashboard": "Dashboard",
+        "dashboard_curator": "Dashboard Kurator",
+        "create_invoice": "Buat Invoice Baru",
+        "create_mou": "Buat MOU Baru",
+        "all_files": "Semua File",
+        "invoices": "Invoice",
+        "mous": "MOU",
+        "sessions": "Sesi",
+        "messages": "Pesan",
+        "review_videos": "Review Video",
+        "curator_results": "Hasil Kurator",
+        "user_management": "Manajemen User",
+        "settings": "Pengaturan",
+        "role": "Peran",
+        "cloud_sync": "Penyimpanan Cloud Aktif (Backblaze)"
+    },
+    "dashboard": {
+        "welcome": "Haii",
+        "greeting_detail": "Berikut adalah ringkasan dokumen Kamu hari ini.",
+        "search_placeholder": "Cari ID, nama, atau judul",
+        "searching": "Mencari",
+        "found_results": "Ditemukan {{count}} hasil",
+        "close": "TUTUP",
+        "no_results": "Hasil tidak ditemukan untuk",
+        "total_invoices": "Invoice",
+        "total_mous": "MOU",
+        "this_month": "Bulan Ini",
+        "all_documents": "Semua Dokumen",
+        "quick_actions": "Aksi Cepat",
+        "create_invoice": "📄 Buat Invoice",
+        "create_mou": "📝 Buat MOU",
+        "all_documents_btn": "📁 Semua Dokumen",
+        "add_user": "Tambah User Baru",
+        "report_today": "LAPOR HARI INI",
+        "reporting": "MELAPOR",
+        "reported_today": "SUDAH REPORT",
+        "no_new_data": "Tidak Ada Data Baru",
+        "report_all_in": "Semua dokumen hari ini sudah masuk dalam laporan. Cek di sini:",
+        "open_sheets": "Buka Google Sheets",
+        "update_success": "Berhasil di-Update!",
+        "report_updated": "Laporan berhasil diperbarui dengan dokumen terbaru.",
+        "view_sheets": "Lihat di Google Sheets",
+        "sync_failed": "Sinkronisasi Gagal",
+        "report_restricted": "Akses laporan dibatasi untuk Sistem",
+        "activity_logs": "Log Aktivitas Sistem",
+        "no_logs": "Belum ada log tercatat.",
+        "recent_activity": "Aktivitas Terbaru",
+        "no_activity": "Belum ada aktivitas.",
+        "details": "Detail",
+        "by": "Oleh",
+        "edit_session": "Edit Sesi",
+        "change_role": "Ubah Peran",
+        "reset_password": "Reset Password",
+        "suspend_user": "Suspend User",
+        "activate_user": "Aktifkan User",
+        "select_role": "Pilih Peran Baru",
+        "new_password": "Password Baru",
+        "confirm_update": "Konfirmasi Update",
+        "no_members": "Tidak ada anggota tim",
+        "team_members": "Anggota Tim",
+        "status": "Status",
+        "user": "User",
+        "action": "Aksi",
+        "requests": {
+            "title": "Permintaan Perubahan",
+            "subtitle": "Tinjau dan setujui permintaan pembaruan profil pengguna",
+            "user": "Pengguna",
+            "change": "Perubahan",
+            "value": "Nilai",
+            "date": "Tanggal",
+            "action": "Aksi",
+            "approve": "Setujui",
+            "reject": "Tolak",
+            "no_requests": "Tidak ada permintaan perubahan yang tertunda.",
+            "success_approve": "Permintaan berhasil disetujui!",
+            "success_reject": "Permintaan berhasil ditolak!"
+        },
+        "actions": {
+            "CREATE_INVOICE": "Buat Invoice",
+            "CREATE_MOU": "Buat MOU",
+            "UPDATE_SESSION": "Update Sesi",
+            "SIGN_INVOICE": "Tanda Tangan Invoice",
+            "SIGN_MOU": "Tanda Tangan MOU"
+        },
+        "roles": {
+            "SYSTEM": "System Administrator",
+            "ANALYST": "Video Analyst",
+            "BD": "Business Development",
+            "MANAGER": "Manager",
+            "TEAM_LEADER": "Team Leader",
+            "FINANCE": "Finance",
+            "BD_ASSISTANT_MANAGER": "Assistant Manager",
+            "CURATOR": "Video Curator",
+            "curator": "Video Curator"
+        }
+    },
+    "settings": {
+        "title": "Keamanan & Akun",
+        "subtitle": "Kelola kredensial dan informasi pribadi Kamu",
+        "role": "Peran",
+        "profile_info": "Informasi Profil",
+        "profile_notice": "Pembaruan nama atau username memerlukan persetujuan manual dari administrator.",
+        "change_password": "Ganti Kata Sandi",
+        "language_title": "Pengaturan Bahasa",
+        "language_subtitle": "Pilih bahasa yang Kamu inginkan untuk antarmuka."
+    },
+    "messages": {
+        "title": "Pesan",
+        "subtitle": "Kamu punya {{count}} notifikasi belum dibaca",
+        "notifications": "Notifikasi",
+        "fetching": "Mengambil pesan...",
+        "no_messages": "Belum ada pesan. Notifikasi sistem akan muncul di sini.",
+        "marked_as_read": "Sudah dibaca",
+        "mark_as_read": "Tandai dibaca"
+    },
+    "documents": {
+        "title": "Semua Dokumen",
+        "subtitle": "Ikhtisar semua dokumen yang telah dibuat dan ditandatangani",
+        "search_placeholder": "Cari di seluruh dokumen...",
+        "doc_info": "INFO DOKUMEN",
+        "created_by": "DIBUAT OLEH",
+        "amount": "JUMLAH",
+        "stamp": "MATERAI",
+        "date": "TANGGAL",
+        "time": "JAM",
+        "action": "AKSI",
+        "loading": "Memuat",
+        "no_docs": "Dokumen tidak ditemukan",
+        "by": "Oleh",
+        "mandatory_stamp": "WAJIB MATERAI",
+        "safe": "AMAN",
+        "download": "Unduh untuk Audit",
+        "view": "Lihat Online",
+        "delete": "Hapus",
+        "delete_confirm_title": "Hapus Dokumen?",
+        "delete_confirm_subtitle": "Tindakan ini tidak dapat dibatalkan. Berikan alasan yang jelas agar pembuat dokumen memahami mengapa dokumen ini dihapus.",
+        "delete_reason_label": "Alasan Penghapusan",
+        "delete_reason_placeholder": "misal: Salah input data, duplikasi, dll",
+        "cancel": "Batal",
+        "delete_forever": "Hapus Selamanya",
+        "deleting": "Menghapus",
+        "reason_required": "Alasan Diperlukan",
+        "reason_required_msg": "Kamu harus memberikan alasan penghapusan.",
+        "deleted_title": "Terhapus!",
+        "deleted_msg": "Dokumen dihapus dan notifikasi telah dikirim ke pembuatnya.",
+        "error_title": "Kesalahan",
+        "download_failed": "Unduh gagal. Silakan coba buka di tab baru.",
+        "no_file_available": "File PDF belum tersedia untuk dokumen draf.",
+        "download_failed_msg": "Gagal mengunduh file. Silakan hubungi admin jika masalah berlanjut.",
+        "session_modal": {
+            "title": "Sesi Berhasil!",
+            "subtitle": "Sesi tanda tangan untuk {{name}} telah berhasil dibuat.",
+            "label_link": "Link Tanda Tangan",
+            "btn_copy": "Salin",
+            "btn_copied": "Tersalin!",
+            "btn_share": "Bagikan ke WhatsApp",
+            "btn_done": "Selesai"
+        }
+    },
+    "notifications": {
+        "session_created_title": "Sesi Dibuat!",
+        "session_created_msg": "Sesi tanda tangan telah berhasil dibuat.",
+        "session_updated_title": "Sesi Diperbarui!",
+        "session_updated_msg": "Data sesi telah berhasil diperbarui.",
+        "pdf_generated_title": "PDF Berhasil!",
+        "pdf_generated_msg": "Dokumen Kamu sudah siap untuk diunduh.",
+        "ref_used_by": "⚠️ digunakan oleh {{owner}}",
+        "user_created": "User berhasil dibuat!",
+        "error_title": "Aksi Gagal",
+        "error_msg": "Terjadi kesalahan. Silakan coba lagi."
+    },
+    "review": {
+        "title": "Analisis Video",
+        "subtitle": "Kelola pengajuan kreator dan kontrol kualitas",
+        "tabs": {
+            "pending": "Belum Direview",
+            "uploaded": "Uploaded (Curator)",
+            "approved": "Selesai",
+            "revision": "Butuh Improve",
+            "rejected": "Ditolak"
+        },
+        "stats": {
+            "today": "Review Hari Ini",
+            "week": "Minggu Ini",
+            "month": "Bulan Ini",
+            "pending": "Tugas Pending"
+        },
+        "modal": {
+            "title": "Mereview",
+            "feedback_label": "Masukan & Catatan",
+            "feedback_placeholder": "Tulis masukan untuk kreator",
+            "reject": "Tolak",
+            "revision": "Masukan",
+            "approve": "SETUJUI VIDEO",
+            "notice": "Menyetujui akan mengupdate Kolom Q di Sheets dan lanjut ke pembiayaan."
+        },
+        "empty": {
+            "title": "Semua Beres!",
+            "subtitle": "Tidak ada video yang menunggu review saat ini."
+        },
+        "search": "Cari nama kreator atau username",
+        "card": {
+            "endorsed_edit": "Endorsed Edit 🎬"
+        }
+    },
+    "curator": {
+        "title": "Curator Dashboard",
+        "subtitle": "Download approved videos, edit, and endorse them for final review.",
+        "search": "Cari kreator...",
+        "tabs": {
+            "pending": "Tahap Kurasi",
+            "endorsed": "Sudah di-Endorse",
+            "history": "Riwayat Endorse"
+        },
+        "stats": {
+            "pending": "Belum Kurasi",
+            "endorsed": "Selesai Endorse"
+        },
+        "empty": {
+            "title": "Sudah Beres!",
+            "subtitle": "Tidak ada video yang ditemukan."
+        },
+        "batch": {
+            "select_all": "Pilih Semua",
+            "selected": "{{count}} Video Terpilih",
+            "download_zip": "Download Batch ZIP",
+            "zipping": "Zipping ({{current}}/{{total}})"
+        },
+        "upload": {
+            "title": "Upload Endorsement",
+            "drag_drop": "Klik atau seret video ke sini",
+            "format": "Format MP4, maks 500MB",
+            "uploading": "Mengunggah...",
+            "submit": "Submit Endorsement"
+        },
+        "card": {
+            "re_edit": "Req Re-Edit Tim Review",
+            "draft": "Draft",
+            "endorse": "Endorse",
+            "finish": "Selesai",
+            "finished": "Selesai Sepenuhnya",
+            "waiting": "Menunggu Review",
+            "download_final": "Download Final",
+            "failed": "Gagal"
+        },
+        "confirm": {
+            "title": "Konfirmasi Aksi",
+            "finish": "Yakin mau mark as finished? Pastikan sudah di approved dari Tim Review.",
+            "download_draft": "Yakin ingin mendownload video draft ini?",
+            "download_final": "Yakin ingin mendownload video yang sudah selesai ini?",
+            "download_batch": "Yakin ingin mendownload seluruh video yang dipilih dalam format ZIP?",
+            "endorse": "Yakin ingin mengupload endorse ini dan mengirimkannya kembali ke Tim Review?",
+            "yes": "Ya, Lanjutkan",
+            "no": "Batal"
+        }
+    }
+}
